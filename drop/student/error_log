@@ -1,0 +1,1 @@
+[08-Oct-2012 18:12:48 UTC] PHP Warning:  mysql_close(): 5 is not a valid MySQL-Link resource in /home/closedwa/public_html/drop/student/index.php on line 68
