@@ -642,11 +642,16 @@
 					
 				
 				?>
-					<div class="contentLook" style='margin:15px;margin-bottom:30px;margin-right:500px;height:250px;width:350px;' id="<?php echo $con['con_id']; ?>c">
-						<div style='margin-left: 15px;'>
+					<div class="contentLook" style='margin-bottom:30px;margin-right:500px;height:280px;width:350px;' id="<?php echo $con['con_id']; ?>c">
+						<div style='margin-left: 10px;'>
 							<table>
 							<h2> </h2>
 							<input type="hidden" name='con_id' value="<?php echo $con['con_id']; ?>" />
+							<tr>
+								<td><em>Date: </em></td><td>
+									<input type=text name='con_date' class='date' value="<?php echo date('m/j/Y',strtotime($con['con_date'])); ?>" />
+								</td>
+							</tr>
 							<tr>
 								<td><em>Contact Type: </em></td><td>
 									<?php echo selectMenu(tableArray("dp_contact_type","contact_type_id","description"),$con['contact_type_id'],"name='contact_type_id'"); ?>

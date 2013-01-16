@@ -433,7 +433,7 @@ require_once('util.php');
 			$("#submit_contact").bind('click',function(e){
 				var id = "#contacts";
 				$s = new Object();
-				var names = ["other", "length", "notes","purpose_id","contact_type_id"];
+				var names = ["other", "con_date", "length", "notes","purpose_id","contact_type_id"];
 				for(i=0;i<names.length;i++){
 					$s[names[i]] = $(id+" input[name="+names[i]+"]").val();
 					if($s[names[i]]===undefined){
@@ -663,6 +663,82 @@ require_once('util.php');
 			<?php if($_SESSION['ALTER_FORMS']){ ?>
 				$("#alterForms_menu").hide();
 				iconToggle("#alterForms",'images/brush.png','images/brush_blue.png',"#alterForms_menu");
+				$(".contact_type_update").click(function(e){
+					var opt = $("#contact_type_opts").val();
+					var name = $("#contact_type_name").val();
+					$.ajax({
+					  url: 'contact/update.php?update_type=1',
+					  type: 'POST',
+					  data:{description:name,contact_type_id:opt},
+					  success: function(data) {
+						notify("Successfully Updated to "+name);
+						$("#contact_type_opts option[value='"+opt+"']").text(name)
+					  }
+					});
+				});
+				$(".contact_type_delete").click(function(e){
+					var opt = $("#contact_type_opts").val();
+					var name = $("#contact_type_opts").val();
+					$.ajax({
+					  url: 'contact/update.php?delete_type=1',
+					  type: 'POST',
+					  data:{description:name,contact_type_id:opt},
+					  success: function(data) {
+						notify("Successfully Deleted ");
+						$("#contact_type_opts option[value='"+opt+"']").remove();
+					  }
+					});
+				});
+				$(".contact_type_add").click(function(e){
+					var opt = $("#contact_type_opts").val();
+					var name = $("#contact_type_name").val();
+					$.ajax({
+					  url: 'contact/update.php?new_type=1',
+					  type: 'POST',
+					  data:{description:name},
+					  success: function(data) {
+						notify("Successfully Added "+name+" (refresh to see)");
+					  }
+					});
+				});
+				$(".contact_purpose_update").click(function(e){
+					var opt = $("#contact_purpose_opts").val();
+					var name = $("#contact_purpose_name").val();
+					$.ajax({
+					  url: 'contact/update.php?update_purpose=1',
+					  type: 'POST',
+					  data:{description:name,purpose_id:opt},
+					  success: function(data) {
+						notify("Successfully Updated to "+name);
+						$("#contact_purpose_opts option[value='"+opt+"']").text(name)
+					  }
+					});
+				});
+				$(".contact_purpose_delete").click(function(e){
+					var opt = $("#contact_purpose_opts").val();
+					var name = $("#contact_purpose_opts").val();
+					$.ajax({
+					  url: 'contact/update.php?delete_purpose=1',
+					  type: 'POST',
+					  data:{description:name,purpose_id:opt},
+					  success: function(data) {
+						notify("Successfully Deleted ");
+						$("#contact_purpose_opts option[value='"+opt+"']").remove();
+					  }
+					});
+				});
+				$(".contact_purpose_add").click(function(e){
+					var opt = $("#contact_purpose_opts").val();
+					var name = $("#contact_purpose_name").val();
+					$.ajax({
+					  url: 'contact/update.php?new_purpose=1',
+					  type: 'POST',
+					  data:{description:name},
+					  success: function(data) {
+						notify("Successfully Added "+name+" (refresh to see)");
+					  }
+					});
+				});
 				$(".intake_lim_update").click(function(e){
 					var opt = $("#intake_lim_opts").val();
 					var name = $("#intake_lim_name").val();
@@ -1460,6 +1536,44 @@ require_once('util.php');
 					
 					 
 			</div>
+			<h2> Contact Form </h2>
+			<div style='margin-left:15px;'>
+				<h3>Purpose</h3>
+					<select id='contact_purpose_opts'>
+						<?php 
+							$qry = "SELECT * FROM dp_purpose ORDER BY description ";
+							$res = SQLQuery($qry);
+							while($row = mysql_fetch_assoc($res)){
+								$v = $row['purpose_id'];
+								$n = $row['description'];
+								echo "<option value='$v'>$n</option>\n";
+							}
+						?>
+					</select>
+					New Name: <input type=text id='contact_purpose_name'/>
+					<button class="contact_purpose_update">Update</button>
+					<button class="contact_purpose_delete">Delete</button>
+					<button class="contact_purpose_add">Add</button>
+				<h3>Contact Type</h3>
+					<select id='contact_type_opts'>
+						<?php 
+							$qry = "SELECT * FROM dp_contact_type ORDER BY description ";
+							$res = SQLQuery($qry);
+							while($row = mysql_fetch_assoc($res)){
+								$v = $row['contact_type_id'];
+								$n = $row['description'];
+								echo "<option value='$v'>$n</option>\n";
+							}
+						?>
+					</select>
+					New Name: <input type=text id='contact_type_name'/>
+					<button class="contact_type_update">Update</button>
+					<button class="contact_type_delete">Delete</button>
+					<button class="contact_type_add">Add</button>
+					
+										
+					 
+			</div>			
 			<h2> Intake Form </h2>
 			<div style='margin-left:15px;'>
 				<h3>Limitations &amp; Learning</h3>
@@ -1632,7 +1746,9 @@ require_once('util.php');
 				<tr>
 					<td><em>Name: </em></td><td><input type=text class='contact_student_search' /><input type=hidden id='contact_student_id_hidden' />
 				</tr>
-				
+				<tr>
+					<td><em>Date: </em></td><td><input name="con_date" type=text value="<?php echo date("m/d/Y"); ?>" class='date' />
+				</tr>
 				<tr>
 					<td><em>Contact Type: </em></td><td>
 						<?php echo selectMenu(tableArray("dp_contact_type","contact_type_id","description"),"","name='contact_type_id'"); ?>

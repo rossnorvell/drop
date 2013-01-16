@@ -25,7 +25,7 @@
 			if (get_magic_quotes_gpc()) {
 				$res = stripslashes($res);
 			}
-			$res = nl2br(htmlspecialchars($res));//don't do this the other way around...
+			$res = htmlspecialchars($res);
 			//$res = mysql_real_escape_string($res);//this throws a shit fit...idk why yet.
 		  return $res;
 		}
@@ -117,7 +117,7 @@
 		return date("m/d/Y",strtotime($d));
 	}
 	//makes an array a list like "hi, there, my name is, Ross"
-	function makeList($aray, $rev=false){
+	function makeList($aray, $rev=false , $quote = false){
 		$res="";
 		$commaTrick=" ";
 		$temp = "";
@@ -126,13 +126,53 @@
 				$temp = $k;
 			}else{
 				$temp = $v;
-			}			
-			$res=$res.($commaTrick.$temp);
+			}
+			if($quote){
+				$res=$res.($commaTrick."'".$temp."'");
+			}else{
+				$res=$res.($commaTrick.$temp);
+			}
 			$commaTrick=", ";
 		}
 		return $res;
 	}
 	
+	function columns($array){return makeList($array, true);}
+	function values($array){return makeList($array, false, true);}
+	function pair_list($pairs){
+		$list = "";
+		$comma = " ";
+		foreach($pairs as $key => $val){
+			$list = $list.$comma.$key."='$val'";
+			$comma = ", ";
+		}
+		return $list;
+	}
+	function update($table, $pairs, $where, $limit=0){
+		Connect();
+		$list = pair_list(clean($pairs));
+		$where = clean($where);
+		$limit = clean($limit);
+		$qry = "UPDATE $table SET $list WHERE $where ";
+		if($limit>0){$qry = $qry." LIMIT $limit ";}
+		SQLQuery($qry) or die("Unable to update database given data: ");
+		Disconnect();
+	}
+	function insert($table, $pairs ){
+		Connect();
+		$columns = columns(clean($pairs));
+		$values = values(clean($pairs));
+		$qry = "INSERT INTO $table($columns) VALUES($values)";
+		SQLQuery($qry) or die("Unable to insert into database given data");		
+		Disconnect();
+	}
+	function delete($table, $where , $limit=0){
+		Connect();
+		$qry = "DELETE FROM $table WHERE $where";
+		if($limit>0){$qry = $qry." LIMIT $limit";}
+		SQLQuery($qry) or die("Unable to delete from database given data");
+		Disconnect();
+	}
 	function isDateBetween($dt_start, $dt_check, $dt_end){ 
 	  if(strtotime($dt_check) > strtotime($dt_start) && strtotime($dt_check) < strtotime($dt_end)){ 
 		return true; 
